@@ -1,0 +1,29 @@
+ESTOQUE FACIL — INICIO RAPIDO NO WINDOWS
+
+1. Extraia TODO o ZIP. Nao execute dentro do arquivo compactado.
+2. Entre na pasta extraida Estoque_Facil.
+3. Clique na barra de endereco do Explorador, digite powershell e pressione Enter.
+4. Digite este unico comando e pressione Enter:
+
+   .\INICIAR.cmd
+
+Tambem pode dar dois cliques no arquivo INICIAR.cmd.
+
+Na primeira vez, aguarde a instalacao das dependencias (precisa de internet).
+Crie uma senha com pelo menos 15 caracteres e confirme.
+A senha nao aparece enquanto digita; isso e normal.
+O usuario sera: operador
+
+O navegador abrira em http://127.0.0.1:5000
+Deixe o terminal aberto. Para encerrar, use Ctrl+C.
+Nas proximas vezes, use INICIAR.cmd e entre com a mesma senha.
+Os cadastros ficam em instance/estoque.db. Preserve essa pasta.
+Use apenas dados ficticios na demonstracao academica.
+
+Para a captura 1: entre no sistema e capture o menu inicial usando Windows+Shift+S.
+Salve a imagem e anexe ao projeto.
+
+Requer Python 3.12 ou superior instalado no Windows.
+Nao ha senha padrao. A conta e criada localmente por voce.
+Este pacote usa servidor de desenvolvimento local; nao e deploy publico.
+Nao compartilhe sua pasta instance, pois contem banco e chave local.
