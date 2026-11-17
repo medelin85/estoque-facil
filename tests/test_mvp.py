@@ -148,3 +148,17 @@ def test_create_account_and_backup(app,tmp_path):
     assert runner.invoke(args=['backup-db',str(dest)]).exit_code==0
     with sqlite3.connect(dest) as db:
         assert db.execute('SELECT COUNT(*) FROM users').fetchone()[0]==2
+
+def test_demo_disabled_by_default(client):
+    assert client.post('/demo',data={'csrf_token':csrf(client,'/login')}).status_code==404
+
+def test_demo_access_is_explicit(app,client):
+    app.config['DEMO_MODE']=True
+    with app.app_context():
+        db=get_db()
+        db.execute('INSERT INTO users(login,password_hash) VALUES(?,?)',('demonstracao',generate_password_hash('apenas teste ficticio')))
+        db.commit()
+    response=client.post('/demo',data={'csrf_token':csrf(client,'/login')},follow_redirects=True)
+    assert response.status_code==200
+    assert 'Demonstração pública' in response.get_data(as_text=True)
+    assert 'Olá, demonstracao' in response.get_data(as_text=True)

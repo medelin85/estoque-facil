@@ -19,6 +19,7 @@ def create_app(test_config=None):
     if production and (not secret or len(secret)<32):
         raise RuntimeError('Configure SECRET_KEY com pelo menos 32 caracteres em produção.')
     app.config.from_mapping(SECRET_KEY=secret or secrets.token_hex(32),
+        DEMO_MODE=os.environ.get('DEMO_MODE','').lower()=='true',
         DATABASE=os.environ.get('DATABASE_PATH',str(Path(app.instance_path)/'estoque.db')),
         SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax', SESSION_COOKIE_SECURE=production,
         MAX_CONTENT_LENGTH=16384, PERMANENT_SESSION_LIFETIME=1800)
@@ -84,6 +85,22 @@ def create_app(test_config=None):
                     db.execute('UPDATE users SET failures=?,locked_until=? WHERE id=?',(0 if failures>=5 else failures,now+900 if failures>=5 else 0,user['id']))
             error='Não foi possível entrar. Confira os dados ou tente novamente mais tarde.'
         return render_template('login.html',error=error)
+
+    @app.post('/demo')
+    def demo_login():
+        if not app.config.get('DEMO_MODE'):
+            abort(404)
+        db=get_db()
+        user=db.execute('SELECT * FROM users WHERE login=? AND active=1',('demonstracao',)).fetchone()
+        if user is None:
+            abort(503)
+        token=secrets.token_hex(32)
+        with db:
+            db.execute('UPDATE users SET token=?,last_seen=? WHERE id=?',(token,time.time(),user['id']))
+        session.clear()
+        session.permanent=True
+        session.update(uid=user['id'],token=token)
+        return redirect(url_for('index'))
 
     @app.post('/logout')
     @protected
